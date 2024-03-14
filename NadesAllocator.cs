@@ -78,9 +78,9 @@ public class PlayerConfig
     public float firegrenade { get; set; } = 0.01f;
 }
 
-public class RoundEndThings : BasePlugin, IPluginConfig<NadesAllocatorConfig>
+public class NadesAllocator : BasePlugin, IPluginConfig<NadesAllocatorConfig>
 {
-    public override string ModuleName => "RoundEndThings";
+    public override string ModuleName => "NadesAllocator";
     public override string ModuleVersion => "1.0.0";
     public override string ModuleAuthor => "unfortunate";
 
