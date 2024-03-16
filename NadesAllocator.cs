@@ -8,6 +8,9 @@ namespace NadesAllocator;
 
 public class NadesAllocatorConfig : BasePluginConfig
 {
+    [JsonPropertyName("System")]
+    public SystemConfig System { get; set; } = new();
+
     [JsonPropertyName("Admin")]
     public AdminConfig Admin { get; set; } = new();
 
@@ -16,6 +19,12 @@ public class NadesAllocatorConfig : BasePluginConfig
 
     [JsonPropertyName("Player")]
     public PlayerConfig Player { get; set; } = new();
+}
+
+public class SystemConfig
+{
+    [JsonPropertyName("delay")]
+    public float Delay { get; set; } = 1.0f;
 }
 
 public class AdminConfig
@@ -99,40 +108,44 @@ public class NadesAllocator : BasePlugin, IPluginConfig<NadesAllocatorConfig>
         var player = @event.Userid;
         if (!IsPlayerValid(player))
             return HookResult.Continue;
+        AddTimer(
+            Config.System.Delay,
+            () =>
+            {
+                if (AdminManager.PlayerHasPermissions(player, $"{Config.Admin.flag}"))
+                {
+                    AllocateNades(
+                        player,
+                        Config.Admin.hegrenade,
+                        Config.Admin.flashbang,
+                        Config.Admin.smoke,
+                        Config.Admin.decoy,
+                        Config.Admin.firegrenade
+                    );
+                }
+                else if (AdminManager.PlayerHasPermissions(player, $"{Config.VIP.flag}"))
+                {
+                    AllocateNades(
+                        player,
+                        Config.VIP.hegrenade,
+                        Config.VIP.flashbang,
+                        Config.VIP.smoke,
+                        Config.VIP.decoy,
+                        Config.VIP.firegrenade
+                    );
+                }
 
-        if (AdminManager.PlayerHasPermissions(player, $"{Config.Admin.flag}"))
-        {
-            AllocateNades(
-                player,
-                Config.Admin.hegrenade,
-                Config.Admin.flashbang,
-                Config.Admin.smoke,
-                Config.Admin.decoy,
-                Config.Admin.firegrenade
-            );
-            return HookResult.Continue;
-        }
-        else if (AdminManager.PlayerHasPermissions(player, $"{Config.VIP.flag}"))
-        {
-            AllocateNades(
-                player,
-                Config.VIP.hegrenade,
-                Config.VIP.flashbang,
-                Config.VIP.smoke,
-                Config.VIP.decoy,
-                Config.VIP.firegrenade
-            );
-            return HookResult.Continue;
-        }
-
-        AllocateNades(
-            player,
-            Config.Player.hegrenade,
-            Config.Player.flashbang,
-            Config.Player.smoke,
-            Config.Player.decoy,
-            Config.Player.firegrenade
+                AllocateNades(
+                    player,
+                    Config.Player.hegrenade,
+                    Config.Player.flashbang,
+                    Config.Player.smoke,
+                    Config.Player.decoy,
+                    Config.Player.firegrenade
+                );
+            }
         );
+
         return HookResult.Continue;
     }
     #endregion
@@ -152,35 +165,35 @@ public class NadesAllocator : BasePlugin, IPluginConfig<NadesAllocatorConfig>
 
         Random random = new Random();
         double randomNumber = random.Next(1, 101) / 100.0;
-        if (randomNumber >= hegrenade)
+        if (randomNumber <= hegrenade)
         {
             if (!PlayerHasWeapon(player, "weapon_hegrenade"))
                 player.GiveNamedItem("weapon_hegrenade");
         }
 
         randomNumber = random.Next(1, 101) / 100.0;
-        if (randomNumber >= flashbang)
+        if (randomNumber <= flashbang)
         {
             if (!PlayerHasWeapon(player, "weapon_flashbang"))
                 player.GiveNamedItem("weapon_flashbang");
         }
 
         randomNumber = random.Next(1, 101) / 100.0;
-        if (randomNumber >= smoke)
+        if (randomNumber <= smoke)
         {
             if (!PlayerHasWeapon(player, "weapon_smokegrenade"))
                 player.GiveNamedItem("weapon_smokegrenade");
         }
 
         randomNumber = random.Next(1, 101) / 100.0;
-        if (randomNumber >= decoy)
+        if (randomNumber <= decoy)
         {
             if (!PlayerHasWeapon(player, "weapon_decoy"))
                 player.GiveNamedItem("weapon_decoy");
         }
 
         randomNumber = random.Next(1, 101) / 100.0;
-        if (randomNumber >= firegrenade)
+        if (randomNumber <= firegrenade)
         {
             switch (player.TeamNum)
             {
